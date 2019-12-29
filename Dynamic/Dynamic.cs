@@ -2086,6 +2086,22 @@ namespace System.Linq.Dynamic
 
         static MethodBase _indexof = null;
 
+
+        Expression NotContains(Expression left, Expression right)
+        {
+            // if left string -> generate method
+            // FIX : if right has spaces -> generate multiple "and indexof()"
+            Expression[] args = new Expression[] { right, Expression.Constant(StringComparison.OrdinalIgnoreCase) };
+            if (_indexof == null)
+            {
+                // using indexof() instead of contains() which is case sensitive
+                FindMethod(typeof(string), "IndexOf", false, args, out MethodBase mb);
+                _indexof = mb;
+            }
+            Expression ex = Expression.Call(left, (MethodInfo)_indexof, args);
+            return Expression.LessThan(ex, Expression.Constant(0));
+        }
+
         // MG
         Expression Contains(Expression left, Expression right)
         {
@@ -2120,8 +2136,19 @@ namespace System.Linq.Dynamic
         }
 
         Expression GenerateNotEqual(Expression left, Expression right)
-        {
-            return Expression.NotEqual(left, right);
+        {            // MG
+            if (left.Type == typeof(Guid))
+            {
+                FindMethod(typeof(Guid), "ToString", false, new Expression[] { }, out MethodBase ts);
+                Expression tse = Expression.Call(left, (MethodInfo)ts, null);
+
+                return NotContains(tse, right);
+            }
+
+            if (left.Type == typeof(string))
+                return NotContains(left, right);
+            else
+                return Expression.NotEqual(left, right);
         }
 
         Expression GenerateGreaterThan(Expression left, Expression right)
