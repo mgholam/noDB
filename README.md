@@ -13,6 +13,6 @@ var result = list.Where("name = \"peter\" and serial<100");
 list.Where("serial<100").Skip(100).Take(10);
 list.Where("serial<100").Orderby("name"); // ascending
 list.Where("serial<100").Orderby("name desc"); // descending
-list.Where("(name = \"peter\" && address = \"hill\") or (serial<100 and date.year=2000)")
+list.Where("(name = \"peter\" && address = \"hill\") or (serial<100 and date.year=2000)");
 ```
 
