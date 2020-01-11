@@ -2086,7 +2086,7 @@ namespace System.Linq.Dynamic
 
         static MethodBase _indexof = null;
 
-
+        // MG
         Expression NotContains(Expression left, Expression right)
         {
             // if left string -> generate method
@@ -2098,8 +2098,10 @@ namespace System.Linq.Dynamic
                 FindMethod(typeof(string), "IndexOf", false, args, out MethodBase mb);
                 _indexof = mb;
             }
+            // null checking left value
+            Expression nn = Expression.Equal(Expression.Constant(null), left);
             Expression ex = Expression.Call(left, (MethodInfo)_indexof, args);
-            return Expression.LessThan(ex, Expression.Constant(0));
+            return Expression.OrElse(nn, Expression.LessThan(ex, Expression.Constant(0)));
         }
 
         // MG
@@ -2114,8 +2116,10 @@ namespace System.Linq.Dynamic
                 FindMethod(typeof(string), "IndexOf", false, args, out MethodBase mb);
                 _indexof = mb;
             }
+            // null checking left value
+            Expression nn = Expression.NotEqual(Expression.Constant(null), left);
             Expression ex = Expression.Call(left, (MethodInfo)_indexof, args);
-            return Expression.GreaterThanOrEqual(ex, Expression.Constant(0));
+            return Expression.AndAlso(nn, Expression.GreaterThanOrEqual(ex, Expression.Constant(0)));
         }
 
         Expression GenerateEqual(Expression left, Expression right)

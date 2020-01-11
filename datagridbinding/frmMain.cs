@@ -132,5 +132,26 @@ namespace datagridbinding
             textBox1.Text = "date.year % 2 = 0";
             Query();
         }
+
+        private void testToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var l = new List<SalesInvoice>();
+
+            l.Add(new SalesInvoice
+            {
+                Address = "a"
+            });
+            l.Add(new SalesInvoice
+            {
+                Name = "b"
+            });
+            l.Add(new SalesInvoice
+            {
+                Name = "a"
+            });
+
+            var a = l.Where("name != 'a'".Replace("'", "\""));
+            var i = a.Count();
+        }
     }
 }
